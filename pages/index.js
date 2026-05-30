@@ -1,7 +1,21 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-
-export default function Home() {
+import Link from 'next/link';
+import FormattedDate from '../lib/FormattedDate';
+import utilStyles from '../styles/utils.module.css';
+import { getStaticData, getAllPostIds} from '../lib/staticPost';
+ 
+export async function getStaticProps() {
+  const allPostsData = getStaticData();
+  // calling the dynamic routes function to get the list of all posts 
+  const postIds = getAllPostIds();
+  return {
+    props: {
+      allPostsData, postIds
+    },
+  };
+}
+export default function Home({ allPostsData, postIds }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -12,11 +26,32 @@ export default function Home() {
       <main>
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Read <Link href="/posts/first-post-sample">this page!</Link>
         </h1>
-
         <p className={styles.description}>
           Get started by editing <code>pages/index.js</code>
         </p>
+
+      <section>
+        <h2 className={utilStyles.heading2Xl}>Dynamic Routes</h2>
+        <ul className={utilStyles.list}>
+          {postIds.map(({ params}) => (
+            <li className={utilStyles.headingXl} key={params.id}>
+              <Link key={params.id} href={`/posts/${params.id}`}>
+               {params.id}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>  
+
+
+        <section>
+        <h2 className={utilStyles.heading2Xl}>Static Post</h2>
+        <p>{allPostsData.title}</p>
+        <p><FormattedDate dateString={allPostsData.date} /></p>
+        <p className={styles.description}>{allPostsData.content}</p>
+      </section>
 
         <div className={styles.grid}>
           <a href="https://nextjs.org/docs" className={styles.card}>
